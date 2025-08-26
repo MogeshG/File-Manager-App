@@ -1,13 +1,15 @@
-import { ScreenContent } from 'components/ScreenContent';
-import { StatusBar } from 'expo-status-bar';
-
 import './global.css';
+import { Provider } from 'react-redux';
+import { store } from 'store/store';
+import { NavigationContainer } from '@react-navigation/native';
+import MainLayout from 'Layouts/MainLayout';
 
 export default function App() {
   return (
-    <>
-      <ScreenContent title="Home" path="App.tsx"></ScreenContent>
-      <StatusBar style="auto" />
-    </>
+    <NavigationContainer>
+      <Provider store={store}>
+        <MainLayout />
+      </Provider>
+    </NavigationContainer>
   );
 }

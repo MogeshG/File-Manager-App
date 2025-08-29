@@ -3,26 +3,43 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from 'components/Header/Header';
 import SideBar from 'components/SideBar/SideBar';
 import { StatusBar } from 'expo-status-bar';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from 'screens/Home';
 import OtherScreen from 'screens/Other';
-import { useSelector } from 'react-redux';
-import { RootState } from 'store/store';
+import { useDispatch } from 'react-redux';
+import { useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { setShowHiddenFiles } from 'store/features/uiSlice';
 
-const Stack = createNativeStackNavigator();
+const Stack = createStackNavigator();
 
 export default function MainLayout() {
-  const currentRoute = useSelector((state: RootState) => state.ui.currentRoute);
+  const dispatch = useDispatch();
+
+  const setHiddenFiles = async () => {
+    const showHidden = (await AsyncStorage.getItem('showHidden')) || false;
+    dispatch(setShowHiddenFiles(showHidden));
+  };
+
+  useEffect(() => {
+    setHiddenFiles();
+  }, []);
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView className="flex-1">
         <Header />
-        <SideBar currentRoute={currentRoute} />
 
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="Home" component={HomeScreen} />
-          <Stack.Screen name="Other" component={OtherScreen} />
-        </Stack.Navigator>
+        <View className="flex-1 flex-row">
+          <View className="flex-1">
+            <Stack.Navigator screenOptions={{ headerShown: false, gestureEnabled: true }}>
+              <Stack.Screen name="Home" component={HomeScreen} />
+              <Stack.Screen name="Other" component={OtherScreen} />
+            </Stack.Navigator>
+          </View>
+
+          <SideBar />
+        </View>
 
         <StatusBar style="auto" />
       </SafeAreaView>
